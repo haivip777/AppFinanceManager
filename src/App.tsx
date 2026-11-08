@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Header } from './components/Header';
+import { Header, ThemeMode } from './components/Header';
 import { CalendarView } from './components/CalendarView';
 import { QuickInput } from './components/QuickInput';
 import { DailyList } from './components/DailyList';
@@ -21,15 +21,15 @@ import { getAIPromptTemplate } from './utils/exportUtils';
 import { FinanceStore, WalletStore } from './types/finance';
 
 export default function App() {
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('vibe_theme');
-      if (saved === 'dark' || saved === 'light') return saved;
-      // Default to light as requested earlier
-      return 'light';
+      const saved = localStorage.getItem('vibe_theme_mode') as ThemeMode;
+      if (saved === 'dark' || saved === 'light' || saved === 'system') return saved;
     }
     return 'light';
   });
+
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
   const [activeTab, setActiveTab] = useState<'journal' | 'wallet'>('journal');
   const [store, setStore] = useState<FinanceStore>({});
@@ -43,27 +43,50 @@ export default function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Sync theme with document class and localStorage
+  // Sync theme with document element and body
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('vibe_theme', theme);
-      if (theme === 'dark') {
+    const checkSystemDark = () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    const updateTheme = () => {
+      let active: 'light' | 'dark' = 'light';
+      if (themeMode === 'system') {
+        active = checkSystemDark() ? 'dark' : 'light';
+      } else {
+        active = themeMode;
+      }
+
+      setResolvedTheme(active);
+      localStorage.setItem('vibe_theme_mode', themeMode);
+
+      if (active === 'dark') {
         document.documentElement.classList.add('dark');
+        document.body.classList.add('dark');
+        document.body.style.backgroundColor = '#0b0f19';
       } else {
         document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+        document.body.style.backgroundColor = '#f8fafc';
       }
+    };
+
+    updateTheme();
+
+    if (themeMode === 'system' && typeof window !== 'undefined') {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const listener = () => updateTheme();
+      media.addEventListener('change', listener);
+      return () => media.removeEventListener('change', listener);
     }
-  }, [theme]);
+  }, [themeMode]);
 
   // Load stores on mount
   useEffect(() => {
     setStore(loadStore());
     setWallet(loadWalletStore());
   }, []);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -72,7 +95,7 @@ export default function App() {
 
   const syncStores = (newStore: FinanceStore) => {
     setStore(newStore);
-    setWallet(loadWalletStore()); // refresh wallet balances after journal changes
+    setWallet(loadWalletStore());
   };
 
   const handleAddEntry = (text: string, date: string) => {
@@ -127,15 +150,15 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200">
+    <div className={`min-h-screen ${resolvedTheme === 'dark' ? 'dark' : ''} bg-[#f8fafc] dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200`}>
       <Header
         currentMonthKey={currentMonthKey}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onOpenExportModal={() => setIsExportModalOpen(true)}
         onCopyPrompt={handleCopyPrompt}
-        theme={theme}
-        onToggleTheme={toggleTheme}
+        themeMode={themeMode}
+        onSelectTheme={setThemeMode}
       />
 
       {/* Main Content Area */}
