@@ -217,32 +217,11 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6">
+      <main className="flex-1 max-w-6xl w-full mx-auto p-3 sm:p-4 md:p-6">
         {activeTab === 'journal' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Left Column: Calendar Sidebar */}
-            <div className="lg:col-span-5 sticky top-20">
-              <CalendarView
-                currentMonthKey={currentMonthKey}
-                onMonthChange={(newMonth) => {
-                  setCurrentMonthKey(newMonth);
-                  setSelectedDate(`${newMonth}-01`);
-                }}
-                selectedDate={selectedDate}
-                onSelectDate={(date) => {
-                  setSelectedDate(date);
-                  const monthOfDate = date.substring(0, 7);
-                  if (monthOfDate !== currentMonthKey) {
-                    setCurrentMonthKey(monthOfDate);
-                  }
-                }}
-                store={store}
-                summary={summary}
-              />
-            </div>
-
-            {/* Right Column: Quick Input & Daily Activities */}
-            <div className="lg:col-span-7 flex flex-col gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
+            {/* Quick Input & Daily Activities: order-1 on mobile so users can type immediately */}
+            <div className="lg:col-span-7 order-1 lg:order-2 flex flex-col gap-4 sm:gap-6">
               <QuickInput
                 selectedDate={selectedDate}
                 onAddEntry={handleAddEntry}
@@ -261,6 +240,27 @@ export default function App() {
                 onUpdateItem={handleUpdateItem}
                 onMoveItems={handleMoveItems}
                 onToggleFavorite={(itemId) => handleToggleFavorite(selectedDate, itemId)}
+              />
+            </div>
+
+            {/* Calendar Sidebar: order-2 on mobile below the input */}
+            <div className="lg:col-span-5 order-2 lg:order-1 lg:sticky lg:top-20">
+              <CalendarView
+                currentMonthKey={currentMonthKey}
+                onMonthChange={(newMonth) => {
+                  setCurrentMonthKey(newMonth);
+                  setSelectedDate(`${newMonth}-01`);
+                }}
+                selectedDate={selectedDate}
+                onSelectDate={(date) => {
+                  setSelectedDate(date);
+                  const monthOfDate = date.substring(0, 7);
+                  if (monthOfDate !== currentMonthKey) {
+                    setCurrentMonthKey(monthOfDate);
+                  }
+                }}
+                store={store}
+                summary={summary}
               />
             </div>
           </div>
@@ -311,7 +311,7 @@ export default function App() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-blue-600 text-white font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-blue-500/25 flex items-center gap-2 text-xs animate-in slide-in-from-bottom-2 duration-150">
+        <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 bg-blue-600 text-white font-bold px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-blue-500/25 flex items-center gap-2 text-xs animate-in slide-in-from-bottom-2 duration-150">
           <span>{toastMessage}</span>
         </div>
       )}

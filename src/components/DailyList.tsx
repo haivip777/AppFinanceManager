@@ -126,28 +126,28 @@ export const DailyList: React.FC<DailyListProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col gap-4 transition-colors duration-200">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3.5 sm:p-5 shadow-sm flex flex-col gap-3 sm:gap-4 transition-colors duration-200">
       {/* Day Header with Status and Daily Total */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+      <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <h2 className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100">
               {isToday ? 'Hôm nay' : dayOfWeek}, {formattedDate}
             </h2>
             {isPastDay && (
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
-                Đã đóng lịch sử
+              <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                Đã đóng
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+          <p className="text-[11px] sm:text-xs text-slate-400 dark:text-slate-500 mt-0.5">
             {items.length > 0 ? `${items.length} khoản ghi chú` : 'Chưa có ghi chép nào'}
           </p>
         </div>
 
         <div className="text-right">
-          <div className="text-xs text-slate-400 dark:text-slate-500 font-medium">Tổng ngày:</div>
-          <div className="text-xl font-extrabold text-blue-700 dark:text-blue-400">
+          <div className="text-[11px] sm:text-xs text-slate-400 dark:text-slate-500 font-medium">Tổng ngày:</div>
+          <div className="text-lg sm:text-xl font-extrabold text-blue-700 dark:text-blue-400">
             {formatVND(totalAmount)}
           </div>
         </div>
@@ -155,7 +155,7 @@ export const DailyList: React.FC<DailyListProps> = ({
 
       {/* Bulk Action Toolbar when items are selected */}
       {items.length > 0 && (
-        <div className="flex items-center justify-between text-xs py-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs py-0.5">
           <button
             onClick={selectAll}
             className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition cursor-pointer"
@@ -165,22 +165,22 @@ export const DailyList: React.FC<DailyListProps> = ({
             ) : (
               <Square className="w-4 h-4" />
             )}
-            <span>
+            <span className="text-xs">
               {selectedIds.length === items.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
             </span>
           </button>
 
           {selectedIds.length > 0 && (
             <div className="flex items-center gap-2 animate-in fade-in duration-150">
-              <span className="font-semibold text-slate-600 dark:text-slate-300">
-                Đã tick chọn: {selectedIds.length}
+              <span className="font-semibold text-slate-600 dark:text-slate-300 text-xs">
+                Đã chọn: {selectedIds.length}
               </span>
               <button
                 onClick={openMoveModalForSelected}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xs cursor-pointer"
+                className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xs cursor-pointer text-xs"
               >
                 <CalendarDays className="w-3.5 h-3.5" />
-                <span>Chuyển sang ngày khác</span>
+                <span>Chuyển ngày</span>
               </button>
             </div>
           )}
@@ -189,13 +189,13 @@ export const DailyList: React.FC<DailyListProps> = ({
 
       {/* Items List */}
       {items.length === 0 ? (
-        <div className="py-12 flex flex-col items-center justify-center text-center text-slate-400 dark:text-slate-600 gap-2">
-          <AlertCircle className="w-8 h-8 text-slate-300 dark:text-slate-700" />
-          <p className="text-sm font-medium">Chưa có khoản chi tiêu nào trong ngày này.</p>
-          <p className="text-xs text-slate-400 dark:text-slate-500">Gõ vào ô bên trên để thêm ghi chép bất kỳ lúc nào.</p>
+        <div className="py-10 sm:py-12 flex flex-col items-center justify-center text-center text-slate-400 dark:text-slate-600 gap-2">
+          <AlertCircle className="w-7 h-7 sm:w-8 sm:h-8 text-slate-300 dark:text-slate-700" />
+          <p className="text-xs sm:text-sm font-medium">Chưa có khoản chi tiêu nào trong ngày này.</p>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500">Gõ vào ô bên trên để thêm ghi chép bất kỳ lúc nào.</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2">
           {items.map((item) => {
             const isEditing = editingId === item.id;
             const isSelected = selectedIds.includes(item.id);
@@ -204,23 +204,22 @@ export const DailyList: React.FC<DailyListProps> = ({
               <div
                 key={item.id}
                 onClick={(e) => {
-                  // Only toggle selection if not clicking buttons or editing input
                   if ((e.target as HTMLElement).closest('button, input')) return;
                   toggleSelectItem(item.id);
                 }}
-                className={`group border rounded-xl p-3.5 flex items-center justify-between gap-3 transition-all duration-150 cursor-pointer ${
+                className={`group border rounded-xl p-2.5 sm:p-3.5 flex items-center justify-between gap-2.5 sm:gap-3 transition-all duration-150 cursor-pointer ${
                   isSelected
                     ? 'bg-blue-50/70 dark:bg-blue-950/40 border-blue-400 dark:border-blue-600'
                     : 'bg-slate-50/70 dark:bg-slate-950/60 border-slate-200/80 dark:border-slate-800/80 hover:border-blue-300 dark:hover:border-blue-700/60 hover:bg-blue-50/20 dark:hover:bg-blue-950/20'
                 }`}
               >
                 {isEditing ? (
-                  <div className="flex-1 flex items-center gap-2">
+                  <div className="flex-1 flex items-center gap-1.5 sm:gap-2">
                     <input
                       type="text"
                       value={editText}
                       onChange={(e) => setEditText(e.target.value)}
-                      className="flex-1 bg-white dark:bg-slate-900 border border-blue-500 rounded-lg px-3 py-1.5 text-sm text-slate-800 dark:text-slate-100 focus:outline-none ring-2 ring-blue-500/20"
+                      className="flex-1 bg-white dark:bg-slate-900 border border-blue-500 rounded-lg px-2.5 py-1 text-xs sm:text-sm text-slate-800 dark:text-slate-100 focus:outline-none ring-2 ring-blue-500/20"
                       autoFocus
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') saveEdit(item.id);
@@ -244,7 +243,7 @@ export const DailyList: React.FC<DailyListProps> = ({
                   </div>
                 ) : (
                   <>
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                       {/* Checkbox */}
                       <button
                         type="button"
@@ -252,7 +251,7 @@ export const DailyList: React.FC<DailyListProps> = ({
                           e.stopPropagation();
                           toggleSelectItem(item.id);
                         }}
-                        className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition shrink-0 cursor-pointer"
+                        className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition shrink-0 p-1 cursor-pointer"
                         title={isSelected ? 'Bỏ chọn' : 'Chọn ghi chú này'}
                       >
                         {isSelected ? (
@@ -269,7 +268,7 @@ export const DailyList: React.FC<DailyListProps> = ({
                           e.stopPropagation();
                           onToggleFavorite(item.id);
                         }}
-                        className="text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 transition shrink-0 cursor-pointer"
+                        className="text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 transition shrink-0 p-1 cursor-pointer"
                         title={item.isFavorite ? 'Bỏ khỏi Whitelist' : 'Thêm vào Whitelist (Yêu thích)'}
                       >
                         <Heart
@@ -281,28 +280,28 @@ export const DailyList: React.FC<DailyListProps> = ({
                         />
                       </button>
 
-                      <div className="text-sm text-slate-800 dark:text-slate-200 font-semibold truncate">
+                      <div className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 font-semibold truncate">
                         {item.rawText}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2.5 shrink-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
                       {item.parsedAmount > 0 && (
-                        <span className="text-sm font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 px-2.5 py-1 rounded-lg">
+                        <span className="text-xs sm:text-sm font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg">
                           {formatVND(item.parsedAmount)}
                         </span>
                       )}
 
-                      <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity duration-150">
-                        {/* Move Single Item button */}
+                      {/* Action buttons: Visible on mobile touch, subtle on desktop hover */}
+                      <div className="opacity-90 sm:opacity-0 sm:group-hover:opacity-100 flex items-center gap-0.5 sm:gap-1 transition-opacity duration-150">
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
                             openMoveModalForSingle(item.id);
                           }}
-                          className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/40 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
-                          title="Chuyển sang ngày khác"
+                          className="p-1 sm:p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/40 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
+                          title="Chuyển ngày"
                         >
                           <CalendarDays className="w-3.5 h-3.5" />
                         </button>
@@ -312,7 +311,7 @@ export const DailyList: React.FC<DailyListProps> = ({
                             e.stopPropagation();
                             startEdit(item);
                           }}
-                          className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition cursor-pointer"
+                          className="p-1 sm:p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition cursor-pointer"
                           title="Sửa"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -323,7 +322,7 @@ export const DailyList: React.FC<DailyListProps> = ({
                             e.stopPropagation();
                             onDeleteItem(item.id);
                           }}
-                          className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer"
+                          className="p-1 sm:p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer"
                           title="Xóa"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -340,12 +339,12 @@ export const DailyList: React.FC<DailyListProps> = ({
 
       {/* Modal Chuyển Ngày */}
       {isMoveModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl flex flex-col gap-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 dark:bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-sm w-full p-4 sm:p-6 shadow-2xl flex flex-col gap-4">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm">
+                <h4 className="font-bold text-slate-800 dark:text-slate-100 text-xs sm:text-sm">
                   Chuyển {itemsToMove.length} ghi chú sang ngày khác
                 </h4>
               </div>
@@ -372,7 +371,7 @@ export const DailyList: React.FC<DailyListProps> = ({
               </div>
 
               {/* Quick shortcut buttons */}
-              <div className="flex items-center gap-1.5 pt-1">
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
                 <span className="text-[11px] text-slate-400">Chọn nhanh:</span>
                 <button
                   type="button"
@@ -411,7 +410,7 @@ export const DailyList: React.FC<DailyListProps> = ({
                   className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white transition shadow-sm cursor-pointer"
                 >
                   <ArrowRight className="w-3.5 h-3.5" />
-                  <span>Xác nhận chuyển</span>
+                  <span>Xác nhận</span>
                 </button>
               </div>
             </form>

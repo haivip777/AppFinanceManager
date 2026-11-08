@@ -113,3 +113,4 @@ export const WhitelistModal: React.FC<WhitelistModalProps> = ({
     </div>
   );
 };
+

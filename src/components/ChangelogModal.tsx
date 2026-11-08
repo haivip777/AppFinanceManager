@@ -14,6 +14,11 @@ export const ChangelogModal: React.FC<ChangelogModalProps> = ({
 
   const updates = [
     {
+      title: 'Tối ưu hiển thị Mobile (Responsive)',
+      badge: 'Mới',
+      desc: 'Tối ưu giao diện cho màn hình điện thoại: ô nhập ghi chú lên đầu, lịch tháng thu gọn thông minh, phím bấm thao tác nhanh to rõ dễ bấm trên màn cảm ứng.',
+    },
+    {
       title: 'Danh sách Yêu thích (Whitelist)',
       badge: 'Mới',
       desc: 'Bấm biểu tượng trái tim ❤️ ở bất kỳ ghi chú nào để lưu vào Whitelist. Nút trái tim trên thanh công cụ cho phép xem toàn bộ ghi chú đã lưu kèm ngày ghi.',
@@ -118,3 +123,4 @@ export const ChangelogModal: React.FC<ChangelogModalProps> = ({
     </div>
   );
 };
+
