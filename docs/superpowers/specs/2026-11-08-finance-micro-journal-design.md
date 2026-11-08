@@ -152,3 +152,4 @@ Bộ bóc tách số tiền thông minh regex nhận diện:
 2. **Kiểm thử Thêm vào ngày cũ**: Chọn ngày hôm qua trên calendar -> thêm note -> kiểm tra dữ liệu đã lưu chính xác vào ngày hôm qua.
 3. **Kiểm thử Export JSON**: Kiểm tra file JSON xuất ra mở được, đúng tháng, đúng tổng tiền và cấu trúc chuẩn cho AI.
 4. **Kiểm thử Responsive UI**: Đảm bảo layout hiển thị đẹp trên cả màn hình Desktop và Mobile.
+
