@@ -1,30 +1,41 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Bot, Wallet, BookOpen, CreditCard, Sun, Moon, Laptop, ChevronDown, Check, Settings } from 'lucide-react';
+import {
+  Wallet,
+  BookOpen,
+  CreditCard,
+  Sun,
+  Moon,
+  Laptop,
+  ChevronDown,
+  Check,
+  Settings,
+  Heart,
+  Bell,
+} from 'lucide-react';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 interface HeaderProps {
-  currentMonthKey: string;
   activeTab: 'journal' | 'wallet';
   onTabChange: (tab: 'journal' | 'wallet') => void;
-  onOpenExportModal: () => void;
   onOpenSettingsModal: () => void;
-  onCopyPrompt: () => void;
+  onOpenWhitelistModal: () => void;
+  onOpenChangelogModal: () => void;
+  favoritesCount: number;
   themeMode: ThemeMode;
   onSelectTheme: (mode: ThemeMode) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  currentMonthKey,
   activeTab,
   onTabChange,
-  onOpenExportModal,
   onOpenSettingsModal,
-  onCopyPrompt,
+  onOpenWhitelistModal,
+  onOpenChangelogModal,
+  favoritesCount,
   themeMode,
   onSelectTheme,
 }) => {
-  const [year, month] = currentMonthKey.split('-');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -77,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80">
             <button
               onClick={() => onTabChange('journal')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'journal'
                   ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
@@ -88,7 +99,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
             <button
               onClick={() => onTabChange('wallet')}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'wallet'
                   ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-sm'
                   : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
@@ -100,13 +111,37 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons, Settings & Theme Dropdown */}
+        {/* Action Buttons: Whitelist, Changelog, Settings, Theme */}
         <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-          {/* Settings Button */}
+          {/* Whitelist / Favorites Button */}
+          <button
+            onClick={onOpenWhitelistModal}
+            className="relative p-2 rounded-xl text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+            title="Danh sách ghi chú yêu thích (Whitelist)"
+          >
+            <Heart className={`w-4 h-4 ${favoritesCount > 0 ? 'fill-rose-500 text-rose-500' : ''}`} />
+            {favoritesCount > 0 && (
+              <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-bold">
+                {favoritesCount}
+              </span>
+            )}
+          </button>
+
+          {/* Changelog / Release Updates Bell */}
+          <button
+            onClick={onOpenChangelogModal}
+            className="relative p-2 rounded-xl text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+            title="Thông báo cập nhật phiên bản mới"
+          >
+            <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900 animate-pulse"></span>
+          </button>
+
+          {/* Settings Button (includes Export JSON & Email Schedule) */}
           <button
             onClick={onOpenSettingsModal}
-            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition"
-            title="Cài đặt gửi email tự động"
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+            title="Cài đặt & Xuất file JSON"
           >
             <Settings className="w-4 h-4 text-slate-600 dark:text-slate-300" />
           </button>
@@ -115,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen((prev) => !prev)}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/90 border border-slate-200 dark:border-slate-700 transition shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700/90 border border-slate-200 dark:border-slate-700 transition shadow-xs cursor-pointer"
               title="Đổi giao diện Sáng / Tối"
             >
               {getThemeIcon()}
@@ -131,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onSelectTheme('light');
                     setIsDropdownOpen(false);
                   }}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
                     themeMode === 'light'
                       ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -149,7 +184,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onSelectTheme('dark');
                     setIsDropdownOpen(false);
                   }}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
                     themeMode === 'dark'
                       ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -167,7 +202,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onSelectTheme('system');
                     setIsDropdownOpen(false);
                   }}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition ${
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition cursor-pointer ${
                     themeMode === 'system'
                       ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -182,23 +217,6 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             )}
           </div>
-
-          <button
-            onClick={onCopyPrompt}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition shadow-xs"
-            title="Sao chép mẫu Prompt để gửi kèm file JSON cho AI"
-          >
-            <Bot className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <span className="hidden sm:inline">Copy Prompt AI</span>
-          </button>
-
-          <button
-            onClick={onOpenExportModal}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition shadow-sm shadow-blue-500/20"
-          >
-            <Download className="w-4 h-4 stroke-[2.3]" />
-            <span>Export JSON Tháng {month}/{year}</span>
-          </button>
         </div>
       </div>
     </header>

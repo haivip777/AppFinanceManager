@@ -1,4 +1,4 @@
-import { FinanceItem, DayRecord, FinanceStore, MonthSummary, WalletStore, WalletTransaction } from '../types/finance';
+import { FinanceItem, DayRecord, FinanceStore, MonthSummary, WalletStore, WalletTransaction, FavoriteNote } from '../types/finance';
 import { parseFinancialText } from './parser';
 
 export const STORAGE_KEY = 'vibe_finance_data_v1';
@@ -215,6 +215,7 @@ export function addFinanceEntry(rawText: string, dateKey?: string): FinanceStore
     parsedAmount: parsed.amount,
     timeStr: getCurrentTimeStr(),
     createdAt: new Date().toISOString(),
+    isFavorite: false,
   };
 
   const existingDay = store[targetDate] || {
@@ -368,6 +369,57 @@ export function moveFinanceEntries(
 
   saveStore(updatedStore);
   return updatedStore;
+}
+
+/**
+ * Toggles whitelist / favorite state of an entry
+ */
+export function toggleFavoriteEntry(dateKey: string, itemId: string): FinanceStore {
+  const store = loadStore();
+  const day = store[dateKey];
+  if (!day) return store;
+
+  const updatedItems = day.items.map((item) => {
+    if (item.id !== itemId) return item;
+    return {
+      ...item,
+      isFavorite: !item.isFavorite,
+    };
+  });
+
+  const updatedStore: FinanceStore = {
+    ...store,
+    [dateKey]: {
+      ...day,
+      items: updatedItems,
+    },
+  };
+
+  saveStore(updatedStore);
+  return updatedStore;
+}
+
+/**
+ * Gets all favorited notes across all dates
+ */
+export function getAllFavoriteEntries(store: FinanceStore): FavoriteNote[] {
+  const favorites: FavoriteNote[] = [];
+
+  Object.entries(store).forEach(([date, dayRecord]) => {
+    dayRecord.items.forEach((item) => {
+      if (item.isFavorite) {
+        favorites.push({
+          id: item.id,
+          date,
+          rawText: item.rawText,
+          parsedAmount: item.parsedAmount,
+        });
+      }
+    });
+  });
+
+  // Sort descending by date
+  return favorites.sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export function getEntriesForDate(store: FinanceStore, dateKey: string): FinanceItem[] {

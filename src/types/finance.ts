@@ -4,6 +4,7 @@ export interface FinanceItem {
   parsedAmount: number;
   timeStr: string;
   createdAt: string;
+  isFavorite?: boolean;
 }
 
 export interface DayRecord {
@@ -53,4 +54,11 @@ export interface EmailSettings {
   resendApiKey?: string;
   lastSentMonth: string | null; // "YYYY-MM"
   lastSentAt: string | null;
+}
+
+export interface FavoriteNote {
+  id: string;
+  date: string;
+  rawText: string;
+  parsedAmount: number;
 }

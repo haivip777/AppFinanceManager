@@ -4,12 +4,12 @@ import {
   Edit2,
   Check,
   X,
-  Clock,
   AlertCircle,
   CalendarDays,
   CheckSquare,
   Square,
   ArrowRight,
+  Heart,
 } from 'lucide-react';
 import { FinanceItem } from '../types/finance';
 import { formatVND } from '../utils/parser';
@@ -23,6 +23,7 @@ interface DailyListProps {
   onDeleteItem: (itemId: string) => void;
   onUpdateItem: (itemId: string, newText: string) => void;
   onMoveItems: (itemIds: string[], fromDate: string, toDate: string) => void;
+  onToggleFavorite: (itemId: string) => void;
 }
 
 export const DailyList: React.FC<DailyListProps> = ({
@@ -32,6 +33,7 @@ export const DailyList: React.FC<DailyListProps> = ({
   onDeleteItem,
   onUpdateItem,
   onMoveItems,
+  onToggleFavorite,
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
@@ -156,7 +158,7 @@ export const DailyList: React.FC<DailyListProps> = ({
         <div className="flex items-center justify-between text-xs py-1">
           <button
             onClick={selectAll}
-            className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition"
+            className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition cursor-pointer"
           >
             {selectedIds.length === items.length ? (
               <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -175,7 +177,7 @@ export const DailyList: React.FC<DailyListProps> = ({
               </span>
               <button
                 onClick={openMoveModalForSelected}
-                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xs"
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xs cursor-pointer"
               >
                 <CalendarDays className="w-3.5 h-3.5" />
                 <span>Chuyển sang ngày khác</span>
@@ -201,7 +203,12 @@ export const DailyList: React.FC<DailyListProps> = ({
             return (
               <div
                 key={item.id}
-                className={`group border rounded-xl p-3.5 flex items-center justify-between gap-3 transition-all duration-150 ${
+                onClick={(e) => {
+                  // Only toggle selection if not clicking buttons or editing input
+                  if ((e.target as HTMLElement).closest('button, input')) return;
+                  toggleSelectItem(item.id);
+                }}
+                className={`group border rounded-xl p-3.5 flex items-center justify-between gap-3 transition-all duration-150 cursor-pointer ${
                   isSelected
                     ? 'bg-blue-50/70 dark:bg-blue-950/40 border-blue-400 dark:border-blue-600'
                     : 'bg-slate-50/70 dark:bg-slate-950/60 border-slate-200/80 dark:border-slate-800/80 hover:border-blue-300 dark:hover:border-blue-700/60 hover:bg-blue-50/20 dark:hover:bg-blue-950/20'
@@ -222,14 +229,14 @@ export const DailyList: React.FC<DailyListProps> = ({
                     />
                     <button
                       onClick={() => saveEdit(item.id)}
-                      className="p-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                      className="p-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer"
                       title="Lưu"
                     >
                       <Check className="w-4 h-4" />
                     </button>
                     <button
                       onClick={cancelEdit}
-                      className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition"
+                      className="p-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition cursor-pointer"
                       title="Hủy"
                     >
                       <X className="w-4 h-4" />
@@ -240,8 +247,12 @@ export const DailyList: React.FC<DailyListProps> = ({
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       {/* Checkbox */}
                       <button
-                        onClick={() => toggleSelectItem(item.id)}
-                        className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition shrink-0"
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleSelectItem(item.id);
+                        }}
+                        className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition shrink-0 cursor-pointer"
                         title={isSelected ? 'Bỏ chọn' : 'Chọn ghi chú này'}
                       >
                         {isSelected ? (
@@ -251,10 +262,25 @@ export const DailyList: React.FC<DailyListProps> = ({
                         )}
                       </button>
 
-                      <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500 text-xs shrink-0">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{item.timeStr}</span>
-                      </div>
+                      {/* Whitelist Heart Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleFavorite(item.id);
+                        }}
+                        className="text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 transition shrink-0 cursor-pointer"
+                        title={item.isFavorite ? 'Bỏ khỏi Whitelist' : 'Thêm vào Whitelist (Yêu thích)'}
+                      >
+                        <Heart
+                          className={`w-4 h-4 transition ${
+                            item.isFavorite
+                              ? 'fill-rose-500 text-rose-500'
+                              : 'hover:text-rose-500'
+                          }`}
+                        />
+                      </button>
+
                       <div className="text-sm text-slate-800 dark:text-slate-200 font-semibold truncate">
                         {item.rawText}
                       </div>
@@ -270,22 +296,34 @@ export const DailyList: React.FC<DailyListProps> = ({
                       <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity duration-150">
                         {/* Move Single Item button */}
                         <button
-                          onClick={() => openMoveModalForSingle(item.id)}
-                          className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/40 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openMoveModalForSingle(item.id);
+                          }}
+                          className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/40 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
                           title="Chuyển sang ngày khác"
                         >
                           <CalendarDays className="w-3.5 h-3.5" />
                         </button>
                         <button
-                          onClick={() => startEdit(item)}
-                          className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startEdit(item);
+                          }}
+                          className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition cursor-pointer"
                           title="Sửa"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
-                          onClick={() => onDeleteItem(item.id)}
-                          className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteItem(item.id);
+                          }}
+                          className="p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer"
                           title="Xóa"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -313,7 +351,7 @@ export const DailyList: React.FC<DailyListProps> = ({
               </div>
               <button
                 onClick={() => setIsMoveModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -339,21 +377,21 @@ export const DailyList: React.FC<DailyListProps> = ({
                 <button
                   type="button"
                   onClick={() => setTargetDateInput(getYesterdayKey())}
-                  className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"
+                  className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
                 >
                   Hôm qua
                 </button>
                 <button
                   type="button"
                   onClick={() => setTargetDateInput(todayKey)}
-                  className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"
+                  className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
                 >
                   Hôm nay
                 </button>
                 <button
                   type="button"
                   onClick={() => setTargetDateInput(getTomorrowKey())}
-                  className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition"
+                  className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition cursor-pointer"
                 >
                   Ngày mai
                 </button>
@@ -363,14 +401,14 @@ export const DailyList: React.FC<DailyListProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsMoveModalOpen(false)}
-                  className="px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  className="px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={!targetDateInput || targetDateInput === selectedDate}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white transition shadow-sm"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white transition shadow-sm cursor-pointer"
                 >
                   <ArrowRight className="w-3.5 h-3.5" />
                   <span>Xác nhận chuyển</span>

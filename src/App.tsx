@@ -3,8 +3,9 @@ import { Header, ThemeMode } from './components/Header';
 import { CalendarView } from './components/CalendarView';
 import { QuickInput } from './components/QuickInput';
 import { DailyList } from './components/DailyList';
-import { ExportModal } from './components/ExportModal';
 import { SettingsModal } from './components/SettingsModal';
+import { WhitelistModal } from './components/WhitelistModal';
+import { ChangelogModal } from './components/ChangelogModal';
 import { WalletView } from './components/WalletView';
 import {
   loadStore,
@@ -13,13 +14,14 @@ import {
   deleteFinanceEntry,
   updateFinanceEntry,
   moveFinanceEntries,
+  toggleFavoriteEntry,
+  getAllFavoriteEntries,
   getMonthSummary,
   getTodayKey,
   depositToWallet,
   transferBetweenWallets,
   setWalletBalance,
 } from './utils/storage';
-import { getAIPromptTemplate } from './utils/exportUtils';
 import {
   loadEmailSettings,
   saveEmailSettings,
@@ -50,8 +52,10 @@ export default function App() {
     return today.substring(0, 7); // "YYYY-MM"
   });
 
-  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  // Modal states
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isWhitelistModalOpen, setIsWhitelistModalOpen] = useState(false);
+  const [isChangelogModalOpen, setIsChangelogModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Sync theme with document element and body
@@ -110,7 +114,6 @@ export default function App() {
     const emailCfg = loadEmailSettings();
     if (!emailCfg.email || !emailCfg.enabled) return;
 
-    // Check if within window (day 4 onwards)
     if (!isEligibleForAutoReport()) return;
 
     const prevMonth = getPreviousMonthKey();
@@ -161,10 +164,9 @@ export default function App() {
     showToast(`Đã chuyển ${itemIds.length} ghi chú sang ngày ${d}/${m}/${y}!`);
   };
 
-  const handleCopyPrompt = () => {
-    const prompt = getAIPromptTemplate(currentMonthKey);
-    navigator.clipboard.writeText(prompt);
-    showToast('Đã copy Prompt AI vào bộ nhớ tạm!');
+  const handleToggleFavorite = (dateKey: string, itemId: string) => {
+    const updated = toggleFavoriteEntry(dateKey, itemId);
+    syncStores(updated);
   };
 
   // Wallet operations
@@ -199,15 +201,17 @@ export default function App() {
     items: [],
   };
 
+  const favoriteNotes = getAllFavoriteEntries(store);
+
   return (
     <div className={`min-h-screen ${resolvedTheme === 'dark' ? 'dark' : ''} bg-[#f8fafc] dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200`}>
       <Header
-        currentMonthKey={currentMonthKey}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onOpenExportModal={() => setIsExportModalOpen(true)}
         onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
-        onCopyPrompt={handleCopyPrompt}
+        onOpenWhitelistModal={() => setIsWhitelistModalOpen(true)}
+        onOpenChangelogModal={() => setIsChangelogModalOpen(true)}
+        favoritesCount={favoriteNotes.length}
         themeMode={themeMode}
         onSelectTheme={setThemeMode}
       />
@@ -256,6 +260,7 @@ export default function App() {
                 onDeleteItem={handleDeleteItem}
                 onUpdateItem={handleUpdateItem}
                 onMoveItems={handleMoveItems}
+                onToggleFavorite={(itemId) => handleToggleFavorite(selectedDate, itemId)}
               />
             </div>
           </div>
@@ -272,22 +277,36 @@ export default function App() {
         )}
       </main>
 
-      {/* Export Modal */}
-      <ExportModal
-        isOpen={isExportModalOpen}
-        onClose={() => setIsExportModalOpen(false)}
-        store={store}
-        currentMonthKey={currentMonthKey}
-      />
-
-      {/* Settings Modal */}
+      {/* Settings & Export JSON Modal */}
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
         settings={emailSettings}
         onSaveSettings={handleSaveEmailSettings}
         store={store}
+        currentMonthKey={currentMonthKey}
         onToast={showToast}
+      />
+
+      {/* Whitelist / Favorites Modal */}
+      <WhitelistModal
+        isOpen={isWhitelistModalOpen}
+        onClose={() => setIsWhitelistModalOpen(false)}
+        favorites={favoriteNotes}
+        onSelectDate={(date) => {
+          setSelectedDate(date);
+          const monthOfDate = date.substring(0, 7);
+          if (monthOfDate !== currentMonthKey) {
+            setCurrentMonthKey(monthOfDate);
+          }
+        }}
+        onToggleFavorite={handleToggleFavorite}
+      />
+
+      {/* Changelog / Release Updates Modal */}
+      <ChangelogModal
+        isOpen={isChangelogModalOpen}
+        onClose={() => setIsChangelogModalOpen(false)}
       />
 
       {/* Toast Notification */}
