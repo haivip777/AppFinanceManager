@@ -4,6 +4,7 @@ import { CalendarView } from './components/CalendarView';
 import { QuickInput } from './components/QuickInput';
 import { DailyList } from './components/DailyList';
 import { ExportModal } from './components/ExportModal';
+import { SettingsModal } from './components/SettingsModal';
 import { WalletView } from './components/WalletView';
 import {
   loadStore,
@@ -18,7 +19,14 @@ import {
   setWalletBalance,
 } from './utils/storage';
 import { getAIPromptTemplate } from './utils/exportUtils';
-import { FinanceStore, WalletStore } from './types/finance';
+import {
+  loadEmailSettings,
+  saveEmailSettings,
+  getPreviousMonthKey,
+  isEligibleForAutoReport,
+  sendMonthlyReportEmail,
+} from './utils/emailService';
+import { FinanceStore, WalletStore, EmailSettings } from './types/finance';
 
 export default function App() {
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
@@ -34,6 +42,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'journal' | 'wallet'>('journal');
   const [store, setStore] = useState<FinanceStore>({});
   const [wallet, setWallet] = useState<WalletStore>(loadWalletStore());
+  const [emailSettings, setEmailSettings] = useState<EmailSettings>(loadEmailSettings());
   const [selectedDate, setSelectedDate] = useState<string>(getTodayKey());
   const [currentMonthKey, setCurrentMonthKey] = useState<string>(() => {
     const today = getTodayKey();
@@ -41,6 +50,7 @@ export default function App() {
   });
 
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Sync theme with document element and body
@@ -86,12 +96,39 @@ export default function App() {
   useEffect(() => {
     setStore(loadStore());
     setWallet(loadWalletStore());
+    setEmailSettings(loadEmailSettings());
   }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  // Auto-detect and send previous month report if in eligibility window (day 4-6 onwards)
+  useEffect(() => {
+    const emailCfg = loadEmailSettings();
+    if (!emailCfg.email || !emailCfg.enabled) return;
+
+    // Check if within window (day 4 onwards)
+    if (!isEligibleForAutoReport()) return;
+
+    const prevMonth = getPreviousMonthKey();
+    if (emailCfg.lastSentMonth !== prevMonth && Object.keys(store).length > 0) {
+      sendMonthlyReportEmail(emailCfg.email, prevMonth, store, emailCfg.resendApiKey).then((res) => {
+        if (res.success) {
+          const updatedCfg: EmailSettings = {
+            ...emailCfg,
+            lastSentMonth: prevMonth,
+            lastSentAt: new Date().toISOString(),
+          };
+          saveEmailSettings(updatedCfg);
+          setEmailSettings(updatedCfg);
+          const [, m] = prevMonth.split('-');
+          showToast(`📧 Đã tự động gửi file JSON báo cáo tháng ${m} về ${emailCfg.email}!`);
+        }
+      });
+    }
+  }, [store]);
 
   const syncStores = (newStore: FinanceStore) => {
     setStore(newStore);
@@ -141,6 +178,11 @@ export default function App() {
     showToast(`Đã cập nhật số dư ví!`);
   };
 
+  const handleSaveEmailSettings = (newSettings: EmailSettings) => {
+    saveEmailSettings(newSettings);
+    setEmailSettings(newSettings);
+  };
+
   const summary = getMonthSummary(store, currentMonthKey);
   const currentDayData = store[selectedDate] || {
     date: selectedDate,
@@ -156,6 +198,7 @@ export default function App() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onOpenExportModal={() => setIsExportModalOpen(true)}
+        onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
         onCopyPrompt={handleCopyPrompt}
         themeMode={themeMode}
         onSelectTheme={setThemeMode}
@@ -226,6 +269,16 @@ export default function App() {
         onClose={() => setIsExportModalOpen(false)}
         store={store}
         currentMonthKey={currentMonthKey}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
+        settings={emailSettings}
+        onSaveSettings={handleSaveEmailSettings}
+        store={store}
+        onToast={showToast}
       />
 
       {/* Toast Notification */}

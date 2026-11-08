@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Bot, Wallet, BookOpen, CreditCard, Sun, Moon, Laptop, ChevronDown, Check } from 'lucide-react';
+import { Download, Bot, Wallet, BookOpen, CreditCard, Sun, Moon, Laptop, ChevronDown, Check, Settings } from 'lucide-react';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -8,6 +8,7 @@ interface HeaderProps {
   activeTab: 'journal' | 'wallet';
   onTabChange: (tab: 'journal' | 'wallet') => void;
   onOpenExportModal: () => void;
+  onOpenSettingsModal: () => void;
   onCopyPrompt: () => void;
   themeMode: ThemeMode;
   onSelectTheme: (mode: ThemeMode) => void;
@@ -18,6 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   onTabChange,
   onOpenExportModal,
+  onOpenSettingsModal,
   onCopyPrompt,
   themeMode,
   onSelectTheme,
@@ -98,8 +100,17 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons & Theme Dropdown */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+        {/* Action Buttons, Settings & Theme Dropdown */}
+        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+          {/* Settings Button */}
+          <button
+            onClick={onOpenSettingsModal}
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition"
+            title="Cài đặt gửi email tự động"
+          >
+            <Settings className="w-4 h-4 text-slate-600 dark:text-slate-300" />
+          </button>
+
           {/* Theme Dropdown */}
           <div className="relative" ref={dropdownRef}>
             <button

@@ -46,3 +46,11 @@ export interface WalletStore {
   spendingBalance: number;
   transactions: WalletTransaction[];
 }
+
+export interface EmailSettings {
+  email: string;
+  enabled: boolean;
+  resendApiKey?: string;
+  lastSentMonth: string | null; // "YYYY-MM"
+  lastSentAt: string | null;
+}
