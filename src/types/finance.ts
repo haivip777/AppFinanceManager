@@ -24,3 +24,25 @@ export interface MonthSummary {
   totalItemsCount: number;
 }
 
+export type WalletTxType =
+  | 'deposit_savings'
+  | 'deposit_spending'
+  | 'transfer_to_savings'
+  | 'transfer_to_spending'
+  | 'expense_auto_deduct'
+  | 'expense_auto_refund'
+  | 'manual_adjustment';
+
+export interface WalletTransaction {
+  id: string;
+  type: WalletTxType;
+  amount: number;
+  description: string;
+  createdAt: string;
+}
+
+export interface WalletStore {
+  savingsBalance: number;
+  spendingBalance: number;
+  transactions: WalletTransaction[];
+}

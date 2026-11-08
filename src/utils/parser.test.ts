@@ -37,3 +37,4 @@ describe('Financial Text NLP Parser', () => {
     expect(formatVND(2500000)).toContain('2.500.000');
   });
 });
+
