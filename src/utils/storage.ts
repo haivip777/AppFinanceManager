@@ -319,6 +319,57 @@ export function updateFinanceEntry(dateKey: string, itemId: string, newRawText: 
   return updatedStore;
 }
 
+/**
+ * Moves specified items from one date to another date
+ */
+export function moveFinanceEntries(
+  itemIds: string[],
+  fromDateKey: string,
+  toDateKey: string
+): FinanceStore {
+  if (fromDateKey === toDateKey || itemIds.length === 0) return loadStore();
+
+  const store = loadStore();
+  const fromDay = store[fromDateKey];
+  if (!fromDay) return store;
+
+  const idsSet = new Set(itemIds);
+  const itemsToMove = fromDay.items.filter((item) => idsSet.has(item.id));
+  if (itemsToMove.length === 0) return store;
+
+  // Remaining items in fromDay
+  const remainingFromItems = fromDay.items.filter((item) => !idsSet.has(item.id));
+  const updatedFromDay: DayRecord = {
+    ...fromDay,
+    items: remainingFromItems,
+    totalAmount: recalculateDayTotal(remainingFromItems),
+  };
+
+  // Target day
+  const toDay = store[toDateKey] || {
+    date: toDateKey,
+    isClosed: toDateKey < getTodayKey(),
+    totalAmount: 0,
+    items: [],
+  };
+
+  const updatedToItems = [...itemsToMove, ...toDay.items];
+  const updatedToDay: DayRecord = {
+    ...toDay,
+    items: updatedToItems,
+    totalAmount: recalculateDayTotal(updatedToItems),
+  };
+
+  const updatedStore: FinanceStore = {
+    ...store,
+    [fromDateKey]: updatedFromDay,
+    [toDateKey]: updatedToDay,
+  };
+
+  saveStore(updatedStore);
+  return updatedStore;
+}
+
 export function getEntriesForDate(store: FinanceStore, dateKey: string): FinanceItem[] {
   return store[dateKey]?.items || [];
 }

@@ -4,6 +4,7 @@ import {
   addFinanceEntry,
   deleteFinanceEntry,
   updateFinanceEntry,
+  moveFinanceEntries,
   getMonthSummary,
 } from './storage';
 
@@ -78,6 +79,20 @@ describe('Storage & Store operations', () => {
     expect(store2[dateKey].items[0].rawText).toBe('Ăn sáng phở đặc biệt 50k');
     expect(store2[dateKey].items[0].parsedAmount).toBe(50000);
     expect(store2[dateKey].totalAmount).toBe(50000);
+  });
+
+  it('moves selected entries from one date to another accurately', () => {
+    const fromDate = '2026-11-08';
+    const toDate = '2026-11-07';
+    const store1 = addFinanceEntry('Ăn sáng 35k', fromDate);
+    addFinanceEntry('Đổ xăng 80k', fromDate);
+    const itemToMoveId = store1[fromDate].items[0].id;
+
+    const store2 = moveFinanceEntries([itemToMoveId], fromDate, toDate);
+    expect(store2[fromDate].items.length).toBe(1);
+    expect(store2[toDate].items.length).toBe(1);
+    expect(store2[toDate].items[0].id).toBe(itemToMoveId);
+    expect(store2[toDate].totalAmount).toBe(35000);
   });
 
   it('calculates monthly summary accurately', () => {

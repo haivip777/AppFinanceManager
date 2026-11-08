@@ -183,3 +183,4 @@ export async function sendMonthlyReportEmail(
     message: `Đã xuất báo cáo tháng ${month}/${year}. (Lưu ý: Để gửi email thực tế vào hòm thư, bạn hãy nhập Resend API Key miễn phí trong phần Cài đặt).`,
   };
 }
+

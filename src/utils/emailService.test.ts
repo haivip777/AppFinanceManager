@@ -24,3 +24,4 @@ describe('Email Service Utils', () => {
     expect(isEligibleForAutoReport(new Date('2026-11-20T10:00:00Z'))).toBe(true);
   });
 });
+

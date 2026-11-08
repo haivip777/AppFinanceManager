@@ -12,6 +12,7 @@ import {
   addFinanceEntry,
   deleteFinanceEntry,
   updateFinanceEntry,
+  moveFinanceEntries,
   getMonthSummary,
   getTodayKey,
   depositToWallet,
@@ -153,6 +154,13 @@ export default function App() {
     showToast('Đã cập nhật ghi chú');
   };
 
+  const handleMoveItems = (itemIds: string[], fromDate: string, toDate: string) => {
+    const updated = moveFinanceEntries(itemIds, fromDate, toDate);
+    syncStores(updated);
+    const [y, m, d] = toDate.split('-');
+    showToast(`Đã chuyển ${itemIds.length} ghi chú sang ngày ${d}/${m}/${y}!`);
+  };
+
   const handleCopyPrompt = () => {
     const prompt = getAIPromptTemplate(currentMonthKey);
     navigator.clipboard.writeText(prompt);
@@ -247,6 +255,7 @@ export default function App() {
                 totalAmount={currentDayData.totalAmount}
                 onDeleteItem={handleDeleteItem}
                 onUpdateItem={handleUpdateItem}
+                onMoveItems={handleMoveItems}
               />
             </div>
           </div>
