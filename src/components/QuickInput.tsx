@@ -42,18 +42,18 @@ export const QuickInput: React.FC<QuickInputProps> = ({
   };
 
   return (
-    <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col gap-3 transition-colors duration-200">
       {/* Target Date Context Banner */}
       <div className="flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
           {isToday ? (
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold border border-blue-200">
-              <Zap className="w-3.5 h-3.5 text-blue-600" />
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
+              <Zap className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               Đang ghi cho Hôm nay ({formatDateLabel(selectedDate)})
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 font-bold border border-amber-200">
-              <CalendarClock className="w-3.5 h-3.5 text-amber-600" />
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">
+              <CalendarClock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
               {isPastDay ? 'Bổ sung ghi chú cho ngày cũ:' : 'Ghi chú cho ngày:'} {formatDateLabel(selectedDate)}
             </span>
           )}
@@ -62,7 +62,7 @@ export const QuickInput: React.FC<QuickInputProps> = ({
         {!isToday && (
           <button
             onClick={onResetToToday}
-            className="flex items-center gap-1 text-slate-500 hover:text-blue-600 transition text-xs font-semibold py-1 px-2 rounded-lg hover:bg-slate-100"
+            className="flex items-center gap-1 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition text-xs font-semibold py-1 px-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Về hôm nay
@@ -79,7 +79,7 @@ export const QuickInput: React.FC<QuickInputProps> = ({
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Gõ nhanh ghi chú... (VD: 'Đổ xăng 80k', 'Ăn phở 45k', 'Tiền điện 450k')"
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white text-sm transition font-medium"
+            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 text-sm transition font-medium"
           />
         </div>
         <button
@@ -95,13 +95,13 @@ export const QuickInput: React.FC<QuickInputProps> = ({
       {/* Live Parser Preview Indicator */}
       {inputText.trim() && (
         <div className="flex items-center gap-2 text-xs pt-1">
-          <span className="text-slate-500">Phát hiện số tiền:</span>
+          <span className="text-slate-500 dark:text-slate-400">Phát hiện số tiền:</span>
           {parsed.hasAmount ? (
-            <span className="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-700 font-extrabold border border-blue-200">
+            <span className="px-2.5 py-0.5 rounded-md bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-extrabold border border-blue-200 dark:border-blue-700">
               {formatVND(parsed.amount)}
             </span>
           ) : (
-            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 border border-slate-200">
+            <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
               Chưa có số tiền (lưu ghi chú thuần)
             </span>
           )}

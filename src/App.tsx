@@ -21,6 +21,16 @@ import { getAIPromptTemplate } from './utils/exportUtils';
 import { FinanceStore, WalletStore } from './types/finance';
 
 export default function App() {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('vibe_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      // Default to light as requested earlier
+      return 'light';
+    }
+    return 'light';
+  });
+
   const [activeTab, setActiveTab] = useState<'journal' | 'wallet'>('journal');
   const [store, setStore] = useState<FinanceStore>({});
   const [wallet, setWallet] = useState<WalletStore>(loadWalletStore());
@@ -33,11 +43,27 @@ export default function App() {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Sync theme with document class and localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('vibe_theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+  }, [theme]);
+
   // Load stores on mount
   useEffect(() => {
     setStore(loadStore());
     setWallet(loadWalletStore());
   }, []);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -101,13 +127,15 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200">
       <Header
         currentMonthKey={currentMonthKey}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onOpenExportModal={() => setIsExportModalOpen(true)}
         onCopyPrompt={handleCopyPrompt}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Main Content Area */}

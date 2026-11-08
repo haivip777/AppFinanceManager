@@ -68,24 +68,24 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const weekHeaders = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
 
   return (
-    <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm flex flex-col gap-5">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col gap-5 transition-colors duration-200">
       {/* Month Switcher Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-        <div className="flex items-center gap-2 text-slate-800 font-bold text-base">
-          <CalendarIcon className="w-5 h-5 text-blue-600" />
+      <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center gap-2 text-slate-800 dark:text-slate-100 font-bold text-base">
+          <CalendarIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           <span>Tháng {month}/{year}</span>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={handlePrevMonth}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition"
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition"
             title="Tháng trước"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={handleNextMonth}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition"
+            className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition"
             title="Tháng sau"
           >
             <ChevronRight className="w-5 h-5" />
@@ -94,7 +94,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       </div>
 
       {/* Week Header */}
-      <div className="grid grid-cols-7 text-center text-xs font-bold text-slate-400">
+      <div className="grid grid-cols-7 text-center text-xs font-bold text-slate-400 dark:text-slate-500">
         {weekHeaders.map((day) => (
           <div key={day} className="py-1">{day}</div>
         ))}
@@ -118,11 +118,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           if (isSelected) {
             btnClass += "bg-blue-600 text-white font-bold shadow-md shadow-blue-500/25 ring-2 ring-blue-500 ";
           } else if (isToday) {
-            btnClass += "bg-blue-50 text-blue-700 font-bold border border-blue-300 hover:bg-blue-100 ";
+            btnClass += "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 font-bold border border-blue-300 dark:border-blue-700/60 hover:bg-blue-100 dark:hover:bg-blue-900/50 ";
           } else if (hasEntries) {
-            btnClass += "bg-slate-50 text-slate-800 hover:bg-slate-100 border border-slate-200/60 font-semibold ";
+            btnClass += "bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 border border-slate-200/60 dark:border-slate-700/60 font-semibold ";
           } else {
-            btnClass += "text-slate-500 hover:bg-slate-50 hover:text-slate-900 ";
+            btnClass += "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white ";
           }
 
           return (
@@ -136,7 +136,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 <div className="flex items-center gap-0.5 mt-0.5">
                   <span
                     className={`w-1.5 h-1.5 rounded-full ${
-                      isSelected ? 'bg-white' : 'bg-blue-600'
+                      isSelected ? 'bg-white' : 'bg-blue-600 dark:bg-blue-400'
                     }`}
                   />
                 </div>
@@ -147,18 +147,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       </div>
 
       {/* Monthly Summary Card */}
-      <div className="mt-2 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-4 flex flex-col gap-2">
-        <div className="flex items-center justify-between text-xs text-blue-700 font-semibold">
+      <div className="mt-2 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-800/80 dark:to-blue-950/40 border border-blue-100 dark:border-blue-900/40 rounded-xl p-4 flex flex-col gap-2">
+        <div className="flex items-center justify-between text-xs text-blue-700 dark:text-blue-300 font-semibold">
           <span className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             Tổng chi tiêu tháng {month}
           </span>
-          <span className="text-slate-500">{summary.daysWithRecordsCount} ngày ghi</span>
+          <span className="text-slate-500 dark:text-slate-400">{summary.daysWithRecordsCount} ngày ghi</span>
         </div>
-        <div className="text-2xl font-extrabold text-blue-700">
+        <div className="text-2xl font-extrabold text-blue-700 dark:text-blue-400">
           {formatVND(summary.totalExpense)}
         </div>
-        <div className="text-xs text-slate-500">
+        <div className="text-xs text-slate-500 dark:text-slate-400">
           {summary.totalItemsCount} khoản giao dịch đã lưu
         </div>
       </div>
